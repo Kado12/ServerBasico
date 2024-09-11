@@ -59,8 +59,7 @@ app.post("/pruebas", async (req, res) => {
         }
       })
     })
-    const data = await response.json()
-    console.log(data)
+    console.log(response)
     res.sendStatus(200)
   } catch (error) {
     console.error(error)
