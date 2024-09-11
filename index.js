@@ -20,8 +20,7 @@ app.get('/', (req, res) => {
 app.post("/pruebas", async (req, res) => {
   try {
     console.log(req.body)
-    console.log(req.data)
-    console.log('Hola mundo')
+    console.log(req.headers)
     res.status(200).json(req.body)
   } catch (error) {
     console.log(error)
