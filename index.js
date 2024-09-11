@@ -61,7 +61,7 @@ app.post("/pruebas", async (req, res) => {
     })
     const data = await response.json()
     console.log(data)
-    res.status(200).json(req.body)
+    res.sendStatus(200)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Error al procesar la solicitud' })
