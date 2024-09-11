@@ -4,8 +4,18 @@ const app = express()
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hola mundo' });
-});
+  const htmlResponse = `
+    <html>
+      <head>
+        <title>NodeJS y Express en Vercel</title>
+      </head>
+      <body>
+        <h1>Hola mundo Backend</h1>
+      </body>
+    </html>
+  `
+  res.send(htmlResponse)
+})
 
 app.post("/pruebas", async (req, res) => {
   try {
