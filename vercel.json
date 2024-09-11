@@ -3,8 +3,7 @@
   "builds": [
     {
       "src": "main.js",
-      "use": "@vercel/node",
-      "debug": true
+      "use": "@vercel/node"
     }
   ]
 }
