@@ -18,16 +18,52 @@ app.get('/', (req, res) => {
   res.send(htmlResponse)
 })
 
+// app.post("/pruebas", async (req, res) => {
+//   try {
+//     console.log(req.body)
+//     fetch('https://example.com/api/endpoint', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         key: 'value',
+//         foo: 'bar'
+//       })
+//     })
+//       .then(response => response.json())
+//       .then(data => console.log(data))
+//       .catch(error => console.error(error));
+//     res.status(200).json(req.body)
+//   } catch (error) {
+//     console.log(error)
+//   }
+// })
+
+
 app.post("/pruebas", async (req, res) => {
   try {
     console.log(req.body)
-    console.log(req.headers)
+    let url = req.body.return_url
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          status: "success"
+        }
+      })
+    })
+    const data = await response.json()
+    console.log(data)
     res.status(200).json(req.body)
   } catch (error) {
-    console.log(error)
+    console.error(error)
+    res.status(500).json({ message: 'Error al procesar la solicitud' })
   }
 })
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
