@@ -45,10 +45,14 @@ app.post("/pruebas", async (req, res) => {
   try {
     console.log(req.body)
     let url = req.body.return_url
+    let token = req.body.token
+    console.log(url, token)
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
       },
       body: JSON.stringify({
         data: {
