@@ -55,7 +55,8 @@ app.post("/pruebas", async (req, res) => {
       },
       body: JSON.stringify({
         data: {
-          status: "success"
+          status: "success",
+          msj: "Hola mundo 🤜🤛 Alex imbecil"
         }
       })
     })
