@@ -45,8 +45,7 @@ app.post("/pruebas", async (req, res) => {
   try {
     console.log(req.body)
     let url = req.body.return_url
-    let token = req.body.token
-    console.log(url, token)
+    let token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjIwMzA0ZjI1ZWEzMjY4MmNjZjU2ZDI5NzVmMzYzZmFhYTlhMDg1YmJmOTNjMzdiMmM0OGI4ZDg2MTM0ZDZhNjA5NzdjOGZiNTk0ZDZmMjYzIn0.eyJhdWQiOiJjZjVhNjI5MS00YTE1LTQ2NzctYTkzZi1lM2ZiZmVjZTZhNjQiLCJqdGkiOiIyMDMwNGYyNWVhMzI2ODJjY2Y1NmQyOTc1ZjM2M2ZhYWE5YTA4NWJiZjkzYzM3YjJjNDhiOGQ4NjEzNGQ2YTYwOTc3YzhmYjU5NGQ2ZjI2MyIsImlhdCI6MTcyNjA5NjMyMCwibmJmIjoxNzI2MDk2MzIwLCJleHAiOjE3NDEzOTIwMDAsInN1YiI6IjkyOTUyOTkiLCJncmFudF90eXBlIjoiIiwiYWNjb3VudF9pZCI6MzI2NDAyNTUsImJhc2VfZG9tYWluIjoia29tbW8uY29tIiwidmVyc2lvbiI6Miwic2NvcGVzIjpbImNybSIsImZpbGVzIiwiZmlsZXNfZGVsZXRlIiwibm90aWZpY2F0aW9ucyIsInB1c2hfbm90aWZpY2F0aW9ucyJdLCJoYXNoX3V1aWQiOiI1NmY0YWQ4NC04ZDE5LTRmZTMtYmM4ZS0yZWZmYTBkZTUzNzciLCJhcGlfZG9tYWluIjoiYXBpLWMua29tbW8uY29tIn0.OyyES79zV1lvzTlgt2L_U_IlSd4UNf7iZER_1MAHg4YqnBJ9_uA6Hr4tZq3QqUs3JiWZxkowAQeDx-Vng_-ZUsavoMzoW0SfKqqN5bjEkx9vH-T-bGtDNs_V3SExbqgD3tap60vCt8uQzMlThl4QnfkusL7e3fExcPWdATq6Wh72PNW6ND77w_gvKYHLHiJGR26r4XPjVOTnSDeZR1O6-Vq47v7fQETLK1vRiH821B1C5QK_SrqO4Fxw9KAsHTk6rZSPM_XU-HSR47XO1778sXKYCSgPUQxrnEKgypoe00Wi5bRSWUXcsM-RSKaQnJovT4HHLba8rFLUvbmdfRB_bg'
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
