@@ -77,7 +77,6 @@ async function main(msg_client, threadsId) {
 }
 
 app.get('/', (req, res) => {
-  createdThread()
   const htmlResponse = `
     <html>
       <head>
