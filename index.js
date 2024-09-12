@@ -129,14 +129,14 @@ app.post("/pruebas", async (req, res) => {
       let thread_created = ''
       let asesor = false
       if (!thread_id) {
-        thread_id = createdThread()
+        thread_id = await createdThread()
       }
 
       let LM = await main(content, thread_id)
       console.log(LM)
 
       if (LM.includes("En un momento un asesor especializado se comunicará contigo para brindarte la ayuda que necesitas")) {
-        deletedThread(thread_id)
+        await deletedThread(thread_id)
         asesor = true
       }
 
@@ -163,7 +163,6 @@ app.post("/pruebas", async (req, res) => {
       res.sendStatus(200)
     } else {
       res.sendStatus(200)
-
     }
 
   } catch (error) {
