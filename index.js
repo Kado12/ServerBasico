@@ -134,7 +134,7 @@ app.post("/pruebas", async (req, res) => {
       let LM = await main(content, thread_id)
       console.log(LM)
 
-      if (LM.includes("un momento un asesor")) {
+      if (content.includes("un asesor especializado se comunicará contigo") || content.includes("un asesor especializado se pondrá en contacto contigo")) {
         await deletedThread(thread_id)
         thread_id = ' '
         asesor = 'Si'
