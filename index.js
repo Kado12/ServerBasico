@@ -1,10 +1,83 @@
+require('dotenv').config()
+const apiKey = process.env.OPENAI_API_KEY
+const assistantId = process.env.ASSISTANT_ID
+//const threadsId = process.env.THREADS_ID
+
 const express = require('express')
+const OpenAI = require('openai')
+const openai = new OpenAI({ apiKey: apiKey })
 
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
+// Preguntar a Chat GPT
+async function chatCompletions() {
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: "system", content: "Cuentame un poema corto" }],
+    model: "gpt-3.5-turbo",
+  });
+
+  console.log(completion.choices[0]);
+  console.log('Respuesta: ' + completion.choices[0].message.content);
+}
+
+// Crear Thread
+async function createdThread() {
+  const emptyThread = await openai.beta.threads.create();
+
+  console.log(emptyThread)
+  return emptyThread.id
+}
+
+// Eliminar Thread
+async function deletedThread(thread_id) {
+  const response = await openai.beta.threads.del(thread_id);
+
+  console.log(response);
+}
+
+async function createdMessage(threads, message) {
+  const messagesResponse = await openai.beta.threads.messages.create(
+    threads,
+    {
+      role: "user",
+      content: message
+    }
+  );
+  return messagesResponse
+}
+
+async function getMessage(assistant, thread) {
+  console.log('Thinking...')
+  const run = await openai.beta.threads.runs.create(
+    thread,
+    {
+      assistant_id: assistant
+    }
+  )
+  while (true) {
+    const runInfo = await openai.beta.threads.runs.retrieve(thread, run.id)
+    if (runInfo.status === "completed") {
+      break
+    }
+    console.log('Waiting 1sec...')
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }
+  const message = await openai.beta.threads.messages.list(thread)
+  const messageContent = message.data[0].content[0].text.value
+  return messageContent
+}
+
+
+async function main(msg_client, threadsId) {
+  const message = await createdMessage(threadsId, msg_client)
+  const lastMessage = await getMessage(assistantId, threadsId)
+  return lastMessage
+}
+
 app.get('/', (req, res) => {
+  createdThread()
   const htmlResponse = `
     <html>
       <head>
@@ -18,34 +91,12 @@ app.get('/', (req, res) => {
   res.send(htmlResponse)
 })
 
-// app.post("/pruebas", async (req, res) => {
-//   try {
-//     console.log(req.body)
-//     fetch('https://example.com/api/endpoint', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({
-//         key: 'value',
-//         foo: 'bar'
-//       })
-//     })
-//       .then(response => response.json())
-//       .then(data => console.log(data))
-//       .catch(error => console.error(error));
-//     res.status(200).json(req.body)
-//   } catch (error) {
-//     console.log(error)
-//   }
-// })
 
-
-app.post("/pruebas", async (req, res) => {
+app.post("/assistant", async (req, res) => {
   try {
     console.log(req.body)
     let url = req.body.return_url
-    let token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjIwMzA0ZjI1ZWEzMjY4MmNjZjU2ZDI5NzVmMzYzZmFhYTlhMDg1YmJmOTNjMzdiMmM0OGI4ZDg2MTM0ZDZhNjA5NzdjOGZiNTk0ZDZmMjYzIn0.eyJhdWQiOiJjZjVhNjI5MS00YTE1LTQ2NzctYTkzZi1lM2ZiZmVjZTZhNjQiLCJqdGkiOiIyMDMwNGYyNWVhMzI2ODJjY2Y1NmQyOTc1ZjM2M2ZhYWE5YTA4NWJiZjkzYzM3YjJjNDhiOGQ4NjEzNGQ2YTYwOTc3YzhmYjU5NGQ2ZjI2MyIsImlhdCI6MTcyNjA5NjMyMCwibmJmIjoxNzI2MDk2MzIwLCJleHAiOjE3NDEzOTIwMDAsInN1YiI6IjkyOTUyOTkiLCJncmFudF90eXBlIjoiIiwiYWNjb3VudF9pZCI6MzI2NDAyNTUsImJhc2VfZG9tYWluIjoia29tbW8uY29tIiwidmVyc2lvbiI6Miwic2NvcGVzIjpbImNybSIsImZpbGVzIiwiZmlsZXNfZGVsZXRlIiwibm90aWZpY2F0aW9ucyIsInB1c2hfbm90aWZpY2F0aW9ucyJdLCJoYXNoX3V1aWQiOiI1NmY0YWQ4NC04ZDE5LTRmZTMtYmM4ZS0yZWZmYTBkZTUzNzciLCJhcGlfZG9tYWluIjoiYXBpLWMua29tbW8uY29tIn0.OyyES79zV1lvzTlgt2L_U_IlSd4UNf7iZER_1MAHg4YqnBJ9_uA6Hr4tZq3QqUs3JiWZxkowAQeDx-Vng_-ZUsavoMzoW0SfKqqN5bjEkx9vH-T-bGtDNs_V3SExbqgD3tap60vCt8uQzMlThl4QnfkusL7e3fExcPWdATq6Wh72PNW6ND77w_gvKYHLHiJGR26r4XPjVOTnSDeZR1O6-Vq47v7fQETLK1vRiH821B1C5QK_SrqO4Fxw9KAsHTk6rZSPM_XU-HSR47XO1778sXKYCSgPUQxrnEKgypoe00Wi5bRSWUXcsM-RSKaQnJovT4HHLba8rFLUvbmdfRB_bg'
+    let token = process.env.TOKEN_WIDGET
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
@@ -68,11 +119,55 @@ app.post("/pruebas", async (req, res) => {
   }
 })
 
+app.post("/pruebas", async (req, res) => {
+  try {
+    console.log(req.body)
+    console.log(req.body.data)
+
+    let content = req.body.data.msj_client
+    let thread_id = req.body.data.thread_id
+    let thread_created = ''
+    let asesor = false
+    if (!thread_id) {
+      thread_id = createdThread()
+    }
+
+    let LM = await main(content, thread_id)
+    console.log(LM)
+
+    if (LM.includes("En un momento un asesor especializado se comunicará contigo para brindarte la ayuda que necesitas")) {
+      deletedThread(thread_id)
+      asesor = true
+    }
+
+    let url = req.body.return_url
+    let token = process.env.TOKEN_WIDGET
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        data: {
+          status: "success",
+          msj: LM,
+          asesor: asesor,
+          threadId: thread_id
+        }
+      })
+    })
+    console.log(response)
+
+    res.sendStatus(200)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Error al procesar la solicitud' })
+  }
+})
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
-
-// {{message_text}}
-
-// {{lead.id}}
