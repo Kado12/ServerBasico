@@ -120,46 +120,52 @@ app.post("/assistant", async (req, res) => {
 
 app.post("/pruebas", async (req, res) => {
   try {
-    console.log(req.body)
-    console.log(req.body.data)
+    if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
+      console.log(req.body)
+      console.log(req.body.data)
 
-    let content = req.body.data.msj_client
-    let thread_id = req.body.data.thread_id
-    let thread_created = ''
-    let asesor = false
-    if (!thread_id) {
-      thread_id = createdThread()
-    }
+      let content = req.body.data.msj_client
+      let thread_id = req.body.data.thread_id
+      let thread_created = ''
+      let asesor = false
+      if (!thread_id) {
+        thread_id = createdThread()
+      }
 
-    let LM = await main(content, thread_id)
-    console.log(LM)
+      let LM = await main(content, thread_id)
+      console.log(LM)
 
-    if (LM.includes("En un momento un asesor especializado se comunicará contigo para brindarte la ayuda que necesitas")) {
-      deletedThread(thread_id)
-      asesor = true
-    }
+      if (LM.includes("En un momento un asesor especializado se comunicará contigo para brindarte la ayuda que necesitas")) {
+        deletedThread(thread_id)
+        asesor = true
+      }
 
-    let url = req.body.return_url
-    let token = process.env.TOKEN_WIDGET
-    const response = await fetch(`${url}`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        data: {
-          status: "success",
-          msj: LM,
-          asesor: asesor,
-          threadId: thread_id
-        }
+      let url = req.body.return_url
+      let token = process.env.TOKEN_WIDGET
+      const response = await fetch(`${url}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          data: {
+            status: "success",
+            msj: LM,
+            asesor: asesor,
+            threadId: thread_id
+          }
+        })
       })
-    })
-    console.log(response)
+      console.log(response)
 
-    res.sendStatus(200)
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(200)
+
+    }
+
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'Error al procesar la solicitud' })
