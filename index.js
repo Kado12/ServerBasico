@@ -126,8 +126,7 @@ app.post("/pruebas", async (req, res) => {
 
       let content = req.body.data.msj_client
       let thread_id = req.body.data.thread_id
-      let thread_created = ''
-      let asesor = false
+      let asesor = 'No'
       if (!thread_id) {
         thread_id = await createdThread()
       }
@@ -137,7 +136,7 @@ app.post("/pruebas", async (req, res) => {
 
       if (LM.includes("En un momento un asesor especializado se comunicará contigo para brindarte la ayuda que necesitas")) {
         await deletedThread(thread_id)
-        asesor = true
+        asesor = 'Si'
       }
 
       let url = req.body.return_url
