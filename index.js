@@ -134,7 +134,8 @@ app.post("/pruebas", async (req, res) => {
       let LM = await main(content, thread_id)
       console.log(LM)
 
-      if (content.includes("un asesor especializado se comunicará contigo") || content.includes("un asesor especializado se pondrá en contacto contigo")) {
+      const regex = /(un asesor especializado se comunicará contigo|un asesor especializado se pondrá en contacto contigo)/i;
+      if (regex.test(LM)) {
         await deletedThread(thread_id)
         thread_id = ' '
         asesor = 'Si'
