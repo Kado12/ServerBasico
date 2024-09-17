@@ -131,8 +131,8 @@ app.post("/pruebas", async (req, res) => {
         thread_id = await createdThread()
       }
 
-      let responseAI = await main(content, thread_id)
-      let objectJSON = JSON.parse(responseAI)
+      let LM = await main(content, thread_id)
+      let objectJSON = JSON.parse(LM)
 
       console.log(objectJSON)
 
@@ -155,7 +155,7 @@ app.post("/pruebas", async (req, res) => {
         body: JSON.stringify({
           data: {
             status: "success",
-            msj: responseAI,
+            msj: LM,
             asesor: asesor,
             threadId: thread_id
           }
