@@ -131,8 +131,10 @@ app.post("/pruebas", async (req, res) => {
         thread_id = await createdThread()
       }
 
-      let LM = await main(content, thread_id)
-      console.log(LM)
+      let responseAI = await main(content, thread_id)
+      let objectJSON = JSON.parse(responseAI)
+
+      console.log(objectJSON)
 
       const regex = /(un asesor especializado se comunicará contigo|un asesor especializado se pondrá en contacto contigo)/i;
       if (regex.test(LM)) {
@@ -153,7 +155,7 @@ app.post("/pruebas", async (req, res) => {
         body: JSON.stringify({
           data: {
             status: "success",
-            msj: LM,
+            msj: responseAI,
             asesor: asesor,
             threadId: thread_id
           }
