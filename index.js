@@ -120,23 +120,21 @@ app.post("/pruebas", async (req, res) => {
       console.log(req.body.data)
       let content = req.body.data.msj_client
       let thread_id = req.body.data.thread_id
-      let asesor = 'No'
       if (!thread_id) {
         thread_id = await createdThread()
       }
 
-      let LM = await main(content, thread_id)
-      let objectJSON = JSON.parse(LM)
+      let responseAI = await main(content, thread_id)
+      let objectJSON = JSON.parse(responseAI)
+      let LM = objectJSON.respuesta
+      let asesor = objectJSON.asesor
 
-      console.log('LM a JSON: ' + objectJSON)
-      console.log('LM a JSON - Respuesta: ' + objectJSON.respuesta)
-      console.log('LM a JSON - Asesor: ' + objectJSON.asesor)
+      console.log('responseAI a JSON - Respuesta: ' + objectJSON.respuesta)
+      console.log('responseAI a JSON - Asesor: ' + objectJSON.asesor)
 
-      const regex = /(un asesor especializado se comunicará contigo|un asesor especializado se pondrá en contacto contigo)/i;
-      if (regex.test(LM)) {
+      if (asesor == 'Si') {
         await deletedThread(thread_id)
         thread_id = ' '
-        asesor = 'Si'
       }
 
       let url = req.body.return_url
