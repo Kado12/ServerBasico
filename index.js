@@ -25,16 +25,12 @@ async function chatCompletions() {
 // Crear Thread
 async function createdThread() {
   const emptyThread = await openai.beta.threads.create();
-
-  console.log(emptyThread)
   return emptyThread.id
 }
 
 // Eliminar Thread
 async function deletedThread(thread_id) {
   const response = await openai.beta.threads.del(thread_id);
-
-  console.log(response);
 }
 
 async function createdMessage(threads, message) {
@@ -121,9 +117,7 @@ app.post("/assistant", async (req, res) => {
 app.post("/pruebas", async (req, res) => {
   try {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
-      console.log(req.body)
       console.log(req.body.data)
-
       let content = req.body.data.msj_client
       let thread_id = req.body.data.thread_id
       let asesor = 'No'
@@ -134,7 +128,7 @@ app.post("/pruebas", async (req, res) => {
       let LM = await main(content, thread_id)
       let objectJSON = JSON.parse(LM)
 
-      console.log(objectJSON)
+      console.log('LM a JSON: ' + objectJSON)
 
       const regex = /(un asesor especializado se comunicará contigo|un asesor especializado se pondrá en contacto contigo)/i;
       if (regex.test(LM)) {
@@ -161,8 +155,6 @@ app.post("/pruebas", async (req, res) => {
           }
         })
       })
-      console.log(response)
-
       res.sendStatus(200)
     } else {
       res.sendStatus(200)
