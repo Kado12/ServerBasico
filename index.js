@@ -129,6 +129,8 @@ app.post("/pruebas", async (req, res) => {
       let objectJSON = JSON.parse(LM)
 
       console.log('LM a JSON: ' + objectJSON)
+      console.log('LM a JSON - Respuesta: ' + objectJSON.respuesta)
+      console.log('LM a JSON - Asesor: ' + objectJSON.asesor)
 
       const regex = /(un asesor especializado se comunicará contigo|un asesor especializado se pondrá en contacto contigo)/i;
       if (regex.test(LM)) {
