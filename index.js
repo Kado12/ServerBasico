@@ -165,6 +165,21 @@ app.post("/casera_ia", async (req, res) => {
 
   } catch (error) {
     console.log(error)
+    let url = req.body.return_url
+    let token = process.env.TOKEN_WIDGET
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        data: {
+          status: "failed"
+        }
+      })
+    })
     res.status(500).json({ message: 'Error al procesar la solicitud' })
   }
 })
