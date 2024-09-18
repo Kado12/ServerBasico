@@ -118,6 +118,7 @@ app.post("/casera_ia", async (req, res) => {
   try {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
       console.log(req.body.data)
+      console.log(req.body.return_url)
       let msj_complete = req.body.data.msj_1 + req.body.data.msj_2 + req.body.data.msj_3 + req.body.data.msj_4 + req.body.data.msj_5
       let content = msj_complete
       let thread_id = req.body.data.thread_id
