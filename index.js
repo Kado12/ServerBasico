@@ -127,6 +127,7 @@ app.post("/casera_ia", async (req, res) => {
       }
 
       let responseAI = await main(content, thread_id)
+      console.log(responseAI)
       let objectJSON = JSON.parse(responseAI)
       let LM = objectJSON.respuesta
       let asesor = objectJSON.asesor
