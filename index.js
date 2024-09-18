@@ -114,11 +114,12 @@ app.post("/assistant", async (req, res) => {
   }
 })
 
-app.post("/pruebas", async (req, res) => {
+app.post("/casera_ia", async (req, res) => {
   try {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
       console.log(req.body.data)
-      let content = req.body.data.msj_client
+      let msj_complete = req.body.data.msj_1 + req.body.data.msj_2 + req.body.data.msj_3 + req.body.data.msj_4 + req.body.data.msj_5
+      let content = msj_complete
       let thread_id = req.body.data.thread_id
       if (!thread_id) {
         thread_id = await createdThread()
