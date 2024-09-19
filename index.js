@@ -119,13 +119,17 @@ app.post("/casera_ia", async (req, res) => {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
       console.log(req.body.data)
       console.log(req.body.return_url)
+      let working_hours = req.body.data.fh
       let name_client = req.body.data.name_client
-      console.log(name_client)
-      let msj_complete = req.body.data.msj_1 + req.body.data.msj_2 + req.body.data.msj_3 + req.body.data.msj_4 + req.body.data.msj_5
+      let msj_complete = `
+        Su mensaje es: ${msj_complete} 
+        `
       if (name_client) {
-        msj_complete = `El nombre del cliente es: ${name_client} \n
-      Su mensaje es: ${msj_complete}`
-
+        msj_complete = `
+        El nombre del cliente es: ${name_client} \n
+        Su mensaje es: ${msj_complete} \n
+        Fuera de Horario: ${working_hours}
+        `
       }
       let content = msj_complete
       let thread_id = req.body.data.thread_id
