@@ -118,21 +118,45 @@ app.post("/casera_ia", async (req, res) => {
   try {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
       console.log(req.body.data)
-      console.log(req.body.return_url)
-      let working_hours = req.body.data.fh
       let name_client = req.body.data.name_client
+      let thread_id = req.body.data.thread_id
+      let url = req.body.return_url
+      let token = process.env.TOKEN_WIDGET
+
       let msj_complete = `
         Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3} ${req.body.data.msj_4} ${req.body.data.msj_5}
         `
+      if (msj_complete.includes('Voice message')) {
+        if (thread_id) {
+          await deletedThread(thread_id)
+        }
+        thread_id = ' '
+        const response = await fetch(`${url}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            data: {
+              status: "success",
+              msj: " ",
+              asesor: "Tarea",
+              threadId: thread_id
+            }
+          })
+        })
+        res.sendStatus(200)
+      }
+
       if (name_client) {
         msj_complete = `
         El nombre del cliente es: ${name_client} \n
         Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3} ${req.body.data.msj_4} ${req.body.data.msj_5} \n
-        Fuera de Horario: ${working_hours}
         `
       }
       let content = msj_complete
-      let thread_id = req.body.data.thread_id
       if (!thread_id) {
         thread_id = await createdThread()
       }
@@ -146,13 +170,12 @@ app.post("/casera_ia", async (req, res) => {
       console.log('responseAI a JSON - Respuesta: ' + objectJSON.respuesta)
       console.log('responseAI a JSON - Asesor: ' + objectJSON.asesor)
 
-      if (asesor == 'Si') {
+      if (asesor == 'Si' || asesor == 'Tarea') {
         await deletedThread(thread_id)
         thread_id = ' '
       }
 
-      let url = req.body.return_url
-      let token = process.env.TOKEN_WIDGET
+
       const response = await fetch(`${url}`, {
         method: 'POST',
         headers: {
