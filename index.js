@@ -122,6 +122,7 @@ app.post("/casera_ia", async (req, res) => {
       let thread_id = req.body.data.thread_id
       let url = req.body.return_url
       let token = process.env.TOKEN_WIDGET
+      let responseAI
 
       let msj_complete = `
         Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3} ${req.body.data.msj_4} ${req.body.data.msj_5}
@@ -160,8 +161,27 @@ app.post("/casera_ia", async (req, res) => {
       if (!thread_id) {
         thread_id = await createdThread()
       }
-
-      let responseAI = await main(content, thread_id)
+      if (thread_id) {
+        responseAI = await main(content, thread_id)
+      } else {
+        const response = await fetch(`${url}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            data: {
+              status: "success",
+              msj: " ",
+              asesor: "Tarea",
+              threadId: " ",
+            }
+          })
+        })
+        res.sendStatus(200)
+      }
       console.log(responseAI)
       let objectJSON = JSON.parse(responseAI)
       let LM = objectJSON.respuesta
