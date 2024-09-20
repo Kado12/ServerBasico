@@ -60,6 +60,7 @@ async function getMessage(assistant, thread) {
     console.log('Waiting 1sec...')
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
+  console.log(runInfo)
   const message = await openai.beta.threads.messages.list(thread)
   const messageContent = message.data[0].content[0].text.value
   return messageContent
@@ -127,7 +128,7 @@ app.post("/casera_ia", async (req, res) => {
       let msj_complete = `
         Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3} ${req.body.data.msj_4} ${req.body.data.msj_5}
         `
-      if (msj_complete.includes('Voice message')) {
+      if (msj_complete.includes('Voice message') || msj_complete.includes('messageContextInfo')) {
         if (thread_id) {
           await deletedThread(thread_id)
         }
