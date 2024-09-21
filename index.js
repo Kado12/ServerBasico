@@ -52,8 +52,9 @@ async function getMessage(assistant, thread) {
       assistant_id: assistant
     }
   )
+  let runInfo
   while (true) {
-    const runInfo = await openai.beta.threads.runs.retrieve(thread, run.id)
+    runInfo = await openai.beta.threads.runs.retrieve(thread, run.id)
     if (runInfo.status === "completed") {
       break
     }
