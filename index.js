@@ -60,7 +60,6 @@ async function getMessage(assistant, thread) {
     console.log('Waiting 1sec...')
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
-  console.log(runInfo)
   const message = await openai.beta.threads.messages.list(thread)
   const messageContent = message.data[0].content[0].text.value
   return messageContent
