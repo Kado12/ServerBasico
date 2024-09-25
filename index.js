@@ -1,7 +1,7 @@
 require('dotenv').config()
 const apiKey = process.env.OPENAI_API_KEY
 const assistantId = process.env.ASSISTANT_ID
-//const threadsId = process.env.THREADS_ID
+const assistantId4K = process.env.ASSISTANT_ID_ELEMENTO4K
 
 const express = require('express')
 const OpenAI = require('openai')
@@ -28,11 +28,12 @@ async function createdThread() {
   return emptyThread.id
 }
 
-// Eliminar Thread
+// Eliminar Thread correspondiente
 async function deletedThread(thread_id) {
   const response = await openai.beta.threads.del(thread_id);
 }
 
+// Crear Mensaje en el Thread correspondiente
 async function createdMessage(threads, message) {
   const messagesResponse = await openai.beta.threads.messages.create(
     threads,
@@ -44,6 +45,7 @@ async function createdMessage(threads, message) {
   return messagesResponse
 }
 
+// Obtener el último mensaje hecho por el Asistente correspondiente en el Thread correspondiente
 async function getMessage(assistant, thread) {
   console.log('Thinking...')
   const run = await openai.beta.threads.runs.create(
@@ -66,10 +68,10 @@ async function getMessage(assistant, thread) {
   return messageContent
 }
 
-
-async function main(msg_client, threadsId) {
+// Función Main para la ejecución de las demás funciones
+async function main(msg_client, threadsId, assistant_Id) {
   const message = await createdMessage(threadsId, msg_client)
-  const lastMessage = await getMessage(assistantId, threadsId)
+  const lastMessage = await getMessage(assistant_Id, threadsId)
   return lastMessage
 }
 
@@ -163,7 +165,7 @@ app.post("/casera_ia", async (req, res) => {
         thread_id = await createdThread()
       }
       if (thread_id) {
-        responseAI = await main(content, thread_id)
+        responseAI = await main(content, thread_id, assistantId)
       } else {
         const response = await fetch(`${url}`, {
           method: 'POST',
@@ -238,6 +240,137 @@ app.post("/casera_ia", async (req, res) => {
     res.status(500).json({ message: 'Error al procesar la solicitud' })
   }
 })
+
+
+
+
+// IA Elemento4K
+app.post("/4k", async (req, res) => {
+  try {
+    if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
+      console.log(req.body.data)
+      let name_client = req.body.data.name_client
+      let thread_id = req.body.data.thread_id
+      let url = req.body.return_url
+      let token = process.env.TOKEN_WIDGET_ELEMENTO4K
+      let responseAI
+
+      let msj_complete = `
+        Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3}
+        `
+      if (msj_complete.includes('Voice message') || msj_complete.includes('messageContextInfo')) {
+        if (thread_id) {
+          await deletedThread(thread_id)
+        }
+        thread_id = ' '
+        const response = await fetch(`${url}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            data: {
+              status: "success",
+              msj: " ",
+              flujo: "asesor",
+              threadId: thread_id
+            }
+          })
+        })
+        res.sendStatus(200)
+      }
+
+      if (name_client) {
+        msj_complete = `
+        El nombre del cliente es: ${name_client} \n
+        Su mensaje es: ${req.body.data.msj_1} ${req.body.data.msj_2} ${req.body.data.msj_3} ${req.body.data.msj_4} ${req.body.data.msj_5} \n
+        `
+      }
+      let content = msj_complete
+      if (!thread_id) {
+        thread_id = await createdThread()
+      }
+      if (thread_id) {
+        responseAI = await main(content, thread_id, assistantId4K)
+      } else {
+        const response = await fetch(`${url}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            data: {
+              status: "success",
+              msj: " ",
+              flujo: "asesor",
+              threadId: " ",
+            }
+          })
+        })
+        res.sendStatus(200)
+      }
+      console.log(responseAI)
+      let objectJSON = JSON.parse(responseAI)
+      let LM = objectJSON.respuesta
+      let flujo = objectJSON.flujo
+
+      console.log('responseAI a JSON - Respuesta: ' + objectJSON.respuesta)
+      console.log('responseAI a JSON - Asesor: ' + objectJSON.flujo)
+
+      if (flujo == 'asesor' || flujo == 'finalizado') {
+        await deletedThread(thread_id)
+        thread_id = ' '
+      }
+
+
+      const response = await fetch(`${url}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          data: {
+            status: "success",
+            msj: LM,
+            flujo: flujo,
+            threadId: thread_id
+          }
+        })
+      })
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(200)
+    }
+
+  } catch (error) {
+    console.log(error)
+    let url = req.body.return_url
+    let token = process.env.TOKEN_WIDGET_ELEMENTO4K
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        data: {
+          status: "failed"
+        }
+      })
+    })
+    res.status(500).json({ message: 'Error al procesar la solicitud' })
+  }
+})
+
+
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

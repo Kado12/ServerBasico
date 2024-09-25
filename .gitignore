@@ -2,3 +2,5 @@ node
 node_modules
 
 .env
+
+.vscode
