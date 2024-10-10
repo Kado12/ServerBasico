@@ -13,15 +13,16 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 // Preguntar a Chat GPT
-// async function chatCompletions() {
-//   const completion = await openai.chat.completions.create({
-//     messages: [{ role: "system", content: "Cuentame un poema corto" }],
-//     model: "gpt-3.5-turbo",
-//   });
+async function chatCompletions(text) {
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: "system", content: text }],
+    model: "gpt-4o-mini",
+  });
 
-//   console.log(completion.choices[0]);
-//   console.log('Respuesta: ' + completion.choices[0].message.content);
-// }
+  console.log(completion.choices[0]);
+  console.log('Respuesta: ' + completion.choices[0].message.content);
+  return completion.choices[0].message.content
+}
 
 // Crear Thread
 async function createdThread() {
@@ -90,12 +91,13 @@ app.get('/', (req, res) => {
   res.send(htmlResponse)
 })
 
-
-app.post("/assistant", async (req, res) => {
+// IA Conversation Kommo Partners
+app.post("/confirmation", async (req, res) => {
   try {
     console.log(req.body)
     let url = req.body.return_url
-    let token = process.env.TOKEN_WIDGET
+    let token = process.env.TOKEN_WIDGET_KOMMO
+    let msj = await chatCompletions(req.body.data.msj_1)
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
@@ -106,18 +108,33 @@ app.post("/assistant", async (req, res) => {
       body: JSON.stringify({
         data: {
           status: "success",
-          msj: "Hola mundo 🤜0️⃣1️⃣2️⃣3️⃣4️⃣🤛 Adios mundo"
+          msj: msj
         }
       })
     })
-    console.log(response)
     res.sendStatus(200)
   } catch (error) {
-    console.error(error)
+    console.log(error)
+    let url = req.body.return_url
+    let token = process.env.TOKEN_WIDGET_KOMMO
+    const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        data: {
+          status: "failed"
+        }
+      })
+    })
     res.status(500).json({ message: 'Error al procesar la solicitud' })
   }
 })
 
+// IA Casera
 app.post("/casera_ia", async (req, res) => {
   try {
     if (req.headers["user-agent"] === "amoCRM-Webhooks/3.0") {
