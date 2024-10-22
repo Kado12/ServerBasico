@@ -514,6 +514,23 @@ app.post("/4kJuego", async (req, res) => {
 })
 
 
+// Ruta para recibir notificaciones
+app.post('/webhook', (req, res) => {
+  console.log(req.body)
+  const resourceState = req.headers['x-goog-resource-state'];
+  const resourceIdFromHeader = req.headers['x-goog-resource-id'];
+
+  // Aquí puedes manejar las notificaciones según el estado del recurso
+  if (resourceState === 'exists') {
+    console.log(`El recurso ${resourceIdFromHeader} ha sido creado o actualizado.`);
+    // Aquí puedes realizar acciones como actualizar tu base de datos
+  } else if (resourceState === 'not_exists') {
+    console.log(`El recurso ${resourceIdFromHeader} ha sido eliminado.`);
+    // Maneja la eliminación del recurso
+  }
+
+  res.sendStatus(200); // Responde con un código 200 para confirmar la recepción
+});
 
 
 const port = process.env.PORT || 3000;
