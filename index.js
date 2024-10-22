@@ -516,7 +516,7 @@ app.post("/4kJuego", async (req, res) => {
 
 // Ruta para recibir notificaciones
 app.post('/webhook', (req, res) => {
-  console.log(req.body)
+  console.log(req)
   const resourceState = req.headers['x-goog-resource-state'];
   const resourceIdFromHeader = req.headers['x-goog-resource-id'];
 
