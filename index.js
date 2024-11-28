@@ -13,6 +13,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 // Preguntar a Chat GPT
+
 async function chatCompletions(text) {
   const completion = await openai.chat.completions.create({
     messages: [{ role: "system", content: text }],
